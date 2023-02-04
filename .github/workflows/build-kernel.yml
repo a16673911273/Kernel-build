@@ -8,19 +8,19 @@ on:
       KERNEL_SOURCE:
         description: 'Kernel Source'
         required: true
-        default: 'https://github.com/LineageOS/android_kernel_xiaomi_sm8250'
+        default: 'https://github.com/tiann/cmi-r-oss'
       KERNEL_SOURCE_BRANCH:
         description: 'Branch'
         required: true
-        default: 'lineage-19.1'
+        default: 'cmi-r-oss'
       KERNEL_DEFCONFIG:
         description: 'Defconfig'
         required: true
-        default: 'vendor/wayne_defconfig'
+        default: 'vendor/lmi_user_defconfig'
       KERNEL_FILE:
         description: 'Your kernel out image name'
         required: true
-        default: 'Image.gz-dtb'
+        default: 'Image'
       CLANG_VERSION:
         description: 'Clang version'
         required: true
@@ -28,7 +28,7 @@ on:
       BUILD_EXTRA_COMMAND:
         description: 'Extra build commands(e.g. LLVM=1 LLVM_IAS=1)'
         required: false
-        default: 'LD=ld.lld LLVM=1 LLVM_IAS=1'
+        default: 'LLVM=1'
       DISABLE-LTO:
         description: 'Disable LTO'
         required: false
@@ -85,7 +85,7 @@ jobs:
     - name: Download Clang-aosp and Gcc-aosp
       run: |
         cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
-        git clone https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-6573524.git --depth=1 clang-aosp
+        git clone https://github.com/dandelion64-Archives/clang-r353983c.git --depth=1 clang-aosp
         mkdir gcc-aosp
         wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/tags/android-11.0.0_r35.tar.gz
         tar -C gcc-aosp/ -zxvf android-11.0.0_r35.tar.gz
@@ -132,7 +132,8 @@ jobs:
         sed -i 's/do.devicecheck=1/do.devicecheck=0/g' AnyKernel3/anykernel.sh
         sed -i 's!block=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!block=auto;!g' AnyKernel3/anykernel.sh
         sed -i 's/is_slot_device=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
-        cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} AnyKernel3/
+        cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }}* AnyKernel3/
+        cp android-kernel/out/arch/arm64/boot/dtbo.img AnyKernel3/
         rm -rf AnyKernel3/.git* AnyKernel3/README.md
 
     - name: Upload AnyKernel3
