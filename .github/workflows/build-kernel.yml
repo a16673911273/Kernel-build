@@ -8,7 +8,7 @@ on:
       KERNEL_SOURCE:
         description: 'Kernel Source'
         required: true
-        default: 'https://github.com/tiann/cmi-r-oss'
+        default: 'https://github.com/ShanshanHY/cmi-r-oss'
       KERNEL_SOURCE_BRANCH:
         description: 'Branch'
         required: true
@@ -85,7 +85,9 @@ jobs:
     - name: Download Clang-aosp and Gcc-aosp
       run: |
         cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
-        git clone https://github.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-5366838 --depth=1 clang-aosp
+        mkdir clang-aosp
+        wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2022/clang-${{ env.CLANG_VERSION }}.tar.gz
+        tar -C clang-aosp/ -zxvf clang-${{ env.CLANG_VERSION }}.tar.gz
         mkdir gcc-aosp
         wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/tags/android-11.0.0_r35.tar.gz
         tar -C gcc-aosp/ -zxvf android-11.0.0_r35.tar.gz
