@@ -8,6 +8,7 @@ on:
         options: 
         - Nexus
         - Perf
+        - Kscope
         required: true
         default: 'Nexus'
       USE_KERNELSU:
