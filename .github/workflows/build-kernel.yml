@@ -1,47 +1,18 @@
-name: Build Kernel
+name: Build Lmi Kernel
 on:
-  watch:
-    types: [started]
-
   workflow_dispatch:
      inputs:
-      KERNEL_SOURCE:
-        description: 'Kernel Source'
+      KERNEL:
+        description: 'Kernel'
+        type: choice
+        options: 
+        - Nexus
+        - Perf
         required: true
-        default: 'https://github.com/ShanshanHY/cmi-r-oss'
-      KERNEL_SOURCE_BRANCH:
-        description: 'Branch'
-        required: true
-        default: 'cmi-r-oss'
-      KERNEL_DEFCONFIG:
-        description: 'Defconfig'
-        required: true
-        default: 'vendor/lmi_user_defconfig'
-      KERNEL_FILE:
-        description: 'Your kernel out image name'
-        required: true
-        default: 'Image'
-      CLANG_VERSION:
-        description: 'Clang version'
-        required: true
-        default: 'r416183b'
-      BUILD_EXTRA_COMMAND:
-        description: 'Extra build commands(e.g. LLVM=1 LLVM_IAS=1)'
-        required: false
-        default: 'LLVM=1'
-      DISABLE-LTO:
-        description: 'Disable LTO'
-        required: false
-        default: 'false'
-        type: boolean
+        default: 'Nexus'
       USE_KERNELSU:
         description: 'Use KernelSU'
         required: true
-        default: 'true'
-        type: boolean
-      USE_KPROBES:
-        description: 'Use Kprobes'
-        required: false
         default: 'true'
         type: boolean
 
@@ -53,27 +24,15 @@ jobs:
     - uses: actions/checkout@v3
     - name: Setup Configuration
       run: |
-        if [ $(cat config.env | grep "USE_CONFIG" | head -n 1 | cut -d "=" -f 2) = true ];then
-            echo "KERNEL_SOURCE=$(cat config.env | grep "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "KERNEL_SOURCE_BRANCH=$(cat config.env | grep "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "KERNEL_DEFCONFIG=$(cat config.env | grep "KERNEL_DEFCONFIG" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "KERNEL_FILE=$(cat config.env | grep "KERNEL_FILE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "CLANG_VERSION=$(cat config.env | grep "CLANG_VERSION" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "BUILD_EXTRA_COMMAND=$(cat config.env | grep "EXTRA_BUILD_COMMAND" | head -n 1 | cut -d ":" -f 2)" >> $GITHUB_ENV
-            echo "DISABLE-LTO=$(cat config.env | grep "DISABLE-LTO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "USE_KERNELSU=$(cat config.env | grep "USE_KERNELSU" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-            echo "USE_KPROBES=$(cat config.env | grep "USE_KPROBES" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        else
-            echo "KERNEL_SOURCE=${{ github.event.inputs.KERNEL_SOURCE }}" >> $GITHUB_ENV
-            echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.KERNEL_SOURCE_BRANCH }}" >> $GITHUB_ENV
-            echo "KERNEL_DEFCONFIG=${{ github.event.inputs.KERNEL_DEFCONFIG }}" >> $GITHUB_ENV
-            echo "KERNEL_FILE=${{ github.event.inputs.KERNEL_FILE }}" >> $GITHUB_ENV
-            echo "CLANG_VERSION=${{ github.event.inputs.CLANG_VERSION }}" >> $GITHUB_ENV
-            echo "BUILD_EXTRA_COMMAND=${{ github.event.inputs.BUILD_EXTRA_COMMAND }}" >> $GITHUB_ENV
-            echo "DISABLE-LTO=${{ github.event.inputs.DISABLE-LTO }}" >> $GITHUB_ENV
-            echo "USE_KERNELSU=${{ github.event.inputs.USE_KERNELSU }}" >> $GITHUB_ENV
-            echo "USE_KPROBES=${{ github.event.inputs.USE_KPROBES }}" >> $GITHUB_ENV
-        fi
+        echo "KERNEL_SOURCE=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_DEFCONFIG=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "KERNEL_DEFCONFIG" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_FILE=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "KERNEL_FILE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "CLANG_VERSION=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "CLANG_VERSION" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "BUILD_EXTRA_COMMAND=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "EXTRA_BUILD_COMMAND" | head -n 1 | cut -d ":" -f 2)" >> $GITHUB_ENV
+        echo "DISABLE-LTO=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "DISABLE-LTO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "USE_KPROBES=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "USE_KPROBES" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "USE_KERNELSU=${{ github.event.inputs.USE_KERNELSU }}" >> $GITHUB_ENV
 
     - name: Setup build kernel environment
       run: |
@@ -117,7 +76,7 @@ jobs:
             sed -i 's/CONFIG_THINLTO=y/CONFIG_THINLTO=n/' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
             echo "CONFIG_LTO_NONE=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
         fi
-
+        
     - name: Build kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
@@ -134,12 +93,19 @@ jobs:
         sed -i 's/do.devicecheck=1/do.devicecheck=0/g' AnyKernel3/anykernel.sh
         sed -i 's!block=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!block=auto;!g' AnyKernel3/anykernel.sh
         sed -i 's/is_slot_device=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
-        cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }}* AnyKernel3/
+        cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} AnyKernel3/
         cp android-kernel/out/arch/arm64/boot/dtbo.img AnyKernel3/
         rm -rf AnyKernel3/.git* AnyKernel3/README.md
 
     - name: Upload AnyKernel3
       uses: actions/upload-artifact@v3
       with:
-        name: AnyKernel3-KernelSU-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        name: ${{ github.event.inputs.KERNEL }}-${{ env.DEVICE }}-KernelSU-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
+
+
+    - name: Upload BuildFile
+      uses: actions/upload-artifact@v3
+      with:
+        name: Build File
+        path: android-kernel/out/drivers/input
