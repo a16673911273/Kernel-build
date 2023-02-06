@@ -5,11 +5,11 @@ on:
       KERNEL_SOURCE:
         description: 'Kernel Source'
         required: true
-        default: 'https://github.com/Diva-Room/Miku_kernel_xiaomi_wayne'
+        default: 'https://github.com/MiCode/Xiaomi_Kernel_OpenSource'
       KERNEL_SOURCE_BRANCH:
         description: 'Branch'
         required: true
-        default: 'TDA'
+        default: 'cmi-r-oss'
       KERNEL_BUILD_CONFIG:
         description: 'Kernel Build Config'
         required: true
@@ -17,7 +17,7 @@ on:
       BOOTIMAGE:
         description: 'Boot image to get ramdisk'
         required: true
-        default: 'https://raw.githubusercontent.com/xiaoleGun/KernelSU_action/main/boot/boot-wayne-from-Miku-UI-latest.img'
+        default: 'https://github.com/Kprobem/img/raw/main/boot.img'
       USE_KPROBES:
         description: 'Use Kprobes'
         required: false
