@@ -9,8 +9,9 @@ on:
         - Nexus
         - Perf
         - Kscope
+        - UtsavBalar1231
         required: true
-        default: 'Nexus'
+        default: 'UtsavBalar1231'
       USE_KERNELSU:
         description: 'Use KernelSU'
         required: true
