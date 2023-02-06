@@ -11,7 +11,7 @@ on:
         - Kscope
         - UtsavBalar1231
         required: true
-        default: 'UtsavBalar1231'
+        default: 'Perf'
       USE_KERNELSU:
         description: 'Use KernelSU'
         required: true
