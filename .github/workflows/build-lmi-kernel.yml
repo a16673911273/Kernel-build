@@ -24,11 +24,6 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
     steps:
     - uses: actions/checkout@v3
-    - name: Change source
-      run: |
-       sudo sed -i "s@http://.*archive.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
-       sudo sed -i "s@http://.*security.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
-    
     - name: Setup Configuration
       run: |
         echo "KERNEL_SOURCE=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
