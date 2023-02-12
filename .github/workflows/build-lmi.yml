@@ -1,4 +1,4 @@
-name: Build Lmi Kernel
+name: Build Lmi
 on:
   workflow_dispatch:
      inputs:
