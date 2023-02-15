@@ -6,9 +6,9 @@ on:
         description: 'Kernel'
         type: choice
         options: 
-        - K40
+        - Kscope
         required: true
-        default: 'K40'
+        default: 'Kscope'
 
 
 jobs:
