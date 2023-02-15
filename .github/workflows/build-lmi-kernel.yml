@@ -81,14 +81,16 @@ jobs:
         cp android-kernel/out/arch/arm64/boot/${{ env.KERNEL_FILE }} AnyKernel3/
         rm -rf AnyKernel3/.git* AnyKernel3/README.md
         
-    - name: Upload KernelData
-      uses: actions/upload-artifact@v3
-      with:
-        name: Kernelwork-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
-        path: android-kernel/out/arch/arm64/boot/*    
+        
     
     - name: Upload AnyKernel3
       uses: actions/upload-artifact@v3
       with:
         name: AnyKernel3-KernelSU-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
+        
+    - name: Upload Build Data
+      uses: actions/upload-artifact@v3
+      with:
+        name: Build-File-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        path: android-kernel/out/arch/arm64/boot/*
