@@ -6,17 +6,10 @@ on:
         description: 'Kernel'
         type: choice
         options: 
-        - Nexus
-        - Perf
-        - Kscope
-        - UtsavBalar1231
+        - K40
         required: true
-        default: 'Perf'
-      USE_KERNELSU:
-        description: 'Use KernelSU'
-        required: true
-        default: 'true'
-        type: boolean
+        default: 'K40'
+
 
 jobs:
   build:
@@ -33,8 +26,7 @@ jobs:
         echo "CLANG_VERSION=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "CLANG_VERSION" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "BUILD_EXTRA_COMMAND=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "EXTRA_BUILD_COMMAND" | head -n 1 | cut -d ":" -f 2)" >> $GITHUB_ENV
         echo "DISABLE-LTO=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "DISABLE-LTO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "USE_KPROBES=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "USE_KPROBES" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "USE_KERNELSU=${{ github.event.inputs.USE_KERNELSU }}" >> $GITHUB_ENV
+
 
     - name: Setup build kernel environment
       run: |
@@ -47,8 +39,8 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE && mkdir kernel_workspace && cd kernel_workspace
         mkdir clang-aosp
-        wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b48af626dc66f956cb9890aa8ea35e265719a4a9/clang-r377782d.tar.gz
-        tar -C clang-aosp/ -zxvf clang-r377782d.tar.gz
+        wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2022/clang-${{ env.CLANG_VERSION }}.tar.gz
+        tar -C clang-aosp/ -zxvf clang-${{ env.CLANG_VERSION }}.tar.gz
         mkdir gcc-aosp
         wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/tags/android-11.0.0_r35.tar.gz
         tar -C gcc-aosp/ -zxvf android-11.0.0_r35.tar.gz
@@ -58,20 +50,11 @@ jobs:
         cd $GITHUB_WORKSPACE/kernel_workspace
         git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
 
-    - name: Setup KernelSU
-      if: env.USE_KERNELSU == 'true'
+    - name: Setup Lto
+      if: env.DISABLE-LTO == 'true'
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-        curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
-        if [ ${{ env.USE_KPROBES }} = true ]; then
-            echo "CONFIG_MODULES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-            echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
-        else
-            wget https://github.com/ShanshanHY/depo/raw/main/patch.py
-            python3 patch.py
-        fi
+
         if [ ${{ env.DISABLE-LTO }} = true ]; then
             sed -i 's/CONFIG_LTO=y/CONFIG_LTO=n/' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
             sed -i 's/CONFIG_LTO_CLANG=y/CONFIG_LTO_CLANG=n/' arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
