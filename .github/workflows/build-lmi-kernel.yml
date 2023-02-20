@@ -63,6 +63,7 @@ jobs:
             echo "CONFIG_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
             echo "CONFIG_HAVE_KPROBES=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
             echo "CONFIG_KPROBE_EVENTS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
+            echo "CONFIG_OVERLAY_FS=y" >> arch/arm64/configs/${{ env.KERNEL_DEFCONFIG }}
         else
             curl -LSs "https://github.com/ShanshanHY/depo/raw/main/patch.py" | python3 -
         fi
