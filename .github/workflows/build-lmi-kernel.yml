@@ -26,9 +26,7 @@ jobs:
         echo "CLANG_VERSION=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "CLANG_VERSION" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "BUILD_EXTRA_COMMAND=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "EXTRA_BUILD_COMMAND" | head -n 1 | cut -d ":" -f 2)" >> $GITHUB_ENV
         echo "DISABLE-LTO=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "DISABLE-LTO" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "USE_KERNELSU=${{ github.event.inputs.USE_KERNELSU }}" >> $GITHUB_ENV
-
-
+        echo "USE_KERNELSU=$(cat lmi/${{ github.event.inputs.KERNEL }}.env | grep "USE_KERNELSU" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
     - name: Setup build kernel environment
       run: |
