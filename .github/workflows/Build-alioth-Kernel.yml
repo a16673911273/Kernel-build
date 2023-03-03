@@ -6,9 +6,9 @@ on:
         description: 'Kernel'
         type: choice
         options: 
-        - K40
+        - K402
         required: true
-        default: 'K40'
+        default: 'K402'
 
 
 jobs:
