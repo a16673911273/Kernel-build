@@ -81,3 +81,9 @@ jobs:
       with:
         name: AnyKernel3-KernelSU-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
+        
+    - name: Upload Build Data
+      uses: actions/upload-artifact@v3
+      with:
+        name: Build-File-${{ env.DEVICE }}-${{ env.BUILD_TIME }}
+        path: kernel_workspace/android-kernel/out
